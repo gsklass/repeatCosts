@@ -174,6 +174,12 @@ def test_get_expenses_filters_aperiodic():
     assert expenses == []
 
 
+def test_get_expenses_filters_old():
+    rows = [{"Category": "OldService", "Description Contains": "", "Amount": "20", "Frequency": "OLD"}]
+    expenses = _patched_get_expenses(rows, [])
+    assert expenses == []
+
+
 def test_get_expenses_filters_delete_category():
     rows = [{"Category": "DELETE", "Description Contains": "", "Amount": "50", "Frequency": "monthly"}]
     expenses = _patched_get_expenses(rows, [])

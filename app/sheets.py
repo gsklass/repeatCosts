@@ -67,7 +67,7 @@ def get_expenses() -> list[dict]:
         raw_amount = row.get("Amount")
         frequency = str(row.get("Frequency", "monthly")).strip().lower()
 
-        if frequency in ("aperiodic",):
+        if frequency in ("aperiodic", "old"):
             continue
 
         estimated = False
