@@ -31,13 +31,13 @@ AUTOCAT_ROWS = [
 # ---------------------------------------------------------------------------
 
 def test_estimate_amount_returns_median():
-    result = estimate_amount("Netflix", TRANSACTIONS)
+    result = estimate_amount("Netflix monthly", TRANSACTIONS)
     # sorted: 15.99, 15.99, 17.99 → median = 15.99
     assert result == 15.99
 
 
 def test_estimate_amount_case_insensitive():
-    result = estimate_amount("spotify", TRANSACTIONS)
+    result = estimate_amount("spotify premium", TRANSACTIONS)
     assert result == 9.99
 
 
@@ -49,6 +49,16 @@ def test_estimate_amount_no_match_returns_none():
 def test_estimate_amount_single_match():
     result = estimate_amount("Spotify Premium", TRANSACTIONS)
     assert result == 9.99
+
+
+def test_estimate_amount_uses_description_contains_over_category():
+    # "Cookunity Inc" should match precisely; "Food" would match broadly
+    txns = [
+        {"Description": "Cookunity Inc charge", "Amount": "-$52.53"},
+        {"Description": "Whole Foods purchase", "Amount": "-$120.00"},
+    ]
+    result = estimate_amount("Cookunity Inc", txns)
+    assert result == 52.53
 
 
 def test_estimate_amount_strips_dollar_signs():

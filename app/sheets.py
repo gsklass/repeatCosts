@@ -43,11 +43,11 @@ def load_transactions(sheet: gspread.Spreadsheet) -> list[dict]:
     return rows
 
 
-def estimate_amount(category: str, transactions: list[dict]) -> float | None:
+def estimate_amount(match_string: str, transactions: list[dict]) -> float | None:
     matched = [
         abs(float(str(t["Amount"]).replace("$", "").replace(",", "").strip()))
         for t in transactions
-        if category.lower() in str(t.get("Description", "")).lower()
+        if match_string.lower() in str(t.get("Description", "")).lower()
         and t.get("Amount") not in ("", None)
     ]
     if not matched:
@@ -75,7 +75,9 @@ def get_expenses() -> list[dict]:
 
         estimated = False
         if raw_amount in ("", None):
-            raw_amount = estimate_amount(category, transactions)
+            desc_contains = str(row.get("Description Contains", "")).strip()
+            match_string = desc_contains if desc_contains else category
+            raw_amount = estimate_amount(match_string, transactions)
             estimated = True
 
         if raw_amount in ("", None):
