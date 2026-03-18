@@ -188,7 +188,7 @@
 
       const fmt = (n) => n == null ? '—' : '$' + n.toFixed(2);
       const fmtAmt = (item) => item.estimated
-        ? `<span class="masked">${fmt(item.monthly_amount)}</span>`
+        ? `<span class="masked">${fmt(item.amount)}</span>`
         : fmt(item.amount);
 
       const rows = data.map((item, i) => `
