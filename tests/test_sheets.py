@@ -88,16 +88,20 @@ def test_estimate_amount_multiple_matches_even_count():
 
 def test_frequency_multipliers_present():
     assert set(FREQUENCY_MULTIPLIERS.keys()) == {
-        "weekly", "monthly", "yearly", "quarterly", "biweekly"
+        "weekly", "monthly", "yearly", "annually", "quarterly",
+        "halfyearly", "biweekly", "bi-weekly",
     }
 
 
 def test_monthly_normalization():
     assert FREQUENCY_MULTIPLIERS["monthly"] == 1.0
     assert abs(FREQUENCY_MULTIPLIERS["yearly"] - 1 / 12) < 1e-9
+    assert abs(FREQUENCY_MULTIPLIERS["annually"] - 1 / 12) < 1e-9
     assert abs(FREQUENCY_MULTIPLIERS["quarterly"] - 1 / 3) < 1e-9
+    assert abs(FREQUENCY_MULTIPLIERS["halfyearly"] - 1 / 6) < 1e-9
     assert abs(FREQUENCY_MULTIPLIERS["weekly"] - 4.33) < 1e-9
     assert abs(FREQUENCY_MULTIPLIERS["biweekly"] - 2.17) < 1e-9
+    assert abs(FREQUENCY_MULTIPLIERS["bi-weekly"] - 2.17) < 1e-9
 
 
 # ---------------------------------------------------------------------------

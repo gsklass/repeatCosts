@@ -13,8 +13,11 @@ FREQUENCY_MULTIPLIERS = {
     "weekly": 4.33,
     "monthly": 1.0,
     "yearly": 1 / 12,
+    "annually": 1 / 12,
     "quarterly": 1 / 3,
+    "halfyearly": 1 / 6,
     "biweekly": 2.17,
+    "bi-weekly": 2.17,
 }
 
 PROJECT_ROOT = Path(__file__).parent.parent
