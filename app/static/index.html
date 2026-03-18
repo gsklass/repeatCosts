@@ -203,14 +203,15 @@
             : '<span class="badge-actual">actual</span>'}</td>
         </tr>`).join('');
 
-      const total = data.reduce((s, x) => s + (x.monthly_amount || 0), 0);
+      const totalMonthly = data.reduce((s, x) => s + (x.monthly_amount || 0), 0);
+      const totalAnnual = totalMonthly * 12;
 
       container.innerHTML = `
         <table>
           <thead>
             <tr>
               <th class="num">#</th>
-              <th>Description Contains</th>
+              <th>Description</th>
               <th>Category</th>
               <th class="num">Amount</th>
               <th>Frequency</th>
@@ -221,7 +222,12 @@
           <tfoot>
             <tr>
               <td colspan="4" class="total-label">Total monthly</td>
-              <td class="total-value num">${fmt(total)}</td>
+              <td class="total-value num">${fmt(totalMonthly)}</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="4" class="total-label">Total annual</td>
+              <td class="total-value num">${fmt(totalAnnual)}</td>
               <td></td>
             </tr>
           </tfoot>

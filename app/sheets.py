@@ -94,6 +94,7 @@ def get_expenses() -> list[dict]:
         expenses.append(
             {
                 "description_contains": str(row.get("Description Contains", "")).strip(),
+                "notes": str(row.get("Notes", "")).strip(),
                 "category": category,
                 "amount": amount,
                 "frequency": frequency,
@@ -103,4 +104,11 @@ def get_expenses() -> list[dict]:
         )
 
     expenses.sort(key=lambda x: x["monthly_amount"], reverse=True)
+
+    from collections import Counter
+    desc_counts = Counter(e["description_contains"] for e in expenses)
+    for e in expenses:
+        if desc_counts[e["description_contains"]] > 1 and e["notes"]:
+            e["description_contains"] = f"{e['description_contains']} - {e['notes']}"
+
     return expenses
