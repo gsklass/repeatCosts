@@ -97,44 +97,12 @@
 
     td.num { text-align: right; font-variant-numeric: tabular-nums; }
 
-    .rank {
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      width: 2.5rem;
-    }
-
-    .desc-contains { color: var(--text-dim); font-size: 0.85rem; }
+    .rank { color: var(--text-dim); font-size: 0.8rem; width: 2.5rem; }
+    .desc-contains { color: var(--text); font-size: 0.9rem; }
     .category { font-weight: bold; color: var(--neon-cyan); }
 
     .amount { color: var(--neon-green); }
     .masked { color: var(--text-dim); letter-spacing: 0.05em; }
-
-    .monthly {
-      color: #fff;
-      font-weight: bold;
-    }
-
-    .badge-actual {
-      display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.72rem;
-      letter-spacing: 0.05em;
-      background: rgba(0, 245, 255, 0.1);
-      color: var(--neon-cyan);
-      border: 1px solid rgba(0, 245, 255, 0.3);
-    }
-
-    .badge-estimated {
-      display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.72rem;
-      letter-spacing: 0.05em;
-      background: rgba(191, 90, 242, 0.1);
-      color: var(--neon-purple);
-      border: 1px solid rgba(191, 90, 242, 0.3);
-    }
 
     tfoot td {
       padding: 0.85rem 1rem;
@@ -146,6 +114,19 @@
 
     tfoot .total-label { letter-spacing: 0.1em; text-transform: uppercase; }
     tfoot .total-value { text-align: right; color: var(--neon-green); font-size: 1.05rem; }
+
+    .key {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      display: flex;
+      gap: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .key-item { display: flex; align-items: center; gap: 0.4rem; }
+    .key-swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; }
+    .key-swatch.actual { background: var(--neon-green); }
+    .key-swatch.estimated { background: var(--text-dim); }
 
     .loading, .error {
       text-align: center;
@@ -167,6 +148,11 @@
     <p class="loading">⟳ LOADING DATA...</p>
   </div>
 
+  <div class="key">
+    <span class="key-item"><span class="key-swatch actual"></span> actual</span>
+    <span class="key-item"><span class="key-swatch estimated"></span> estimated</span>
+  </div>
+
   <script>
     async function loadExpenses() {
       const container = document.getElementById('container');
@@ -186,21 +172,18 @@
         return;
       }
 
-      const fmt = (n) => n == null ? '—' : '$' + n.toFixed(2);
+      const fmt = (n) => n == null ? '—' : '$' + Math.abs(n).toFixed(2);
       const fmtAmt = (item) => item.estimated
         ? `<span class="masked">${fmt(item.amount)}</span>`
-        : fmt(item.amount);
+        : `<span class="amount">${fmt(item.amount)}</span>`;
 
       const rows = data.map((item, i) => `
         <tr>
           <td class="rank num">${i + 1}</td>
           <td class="desc-contains">${escHtml(item.description_contains)}</td>
           <td class="category">${escHtml(item.category)}</td>
-          <td class="amount num">${fmtAmt(item)}</td>
+          <td class="num">${fmtAmt(item)}</td>
           <td>${escHtml(item.frequency)}</td>
-          <td>${item.estimated
-            ? '<span class="badge-estimated">✨ estimated</span>'
-            : '<span class="badge-actual">actual</span>'}</td>
         </tr>`).join('');
 
       const totalMonthly = data.reduce((s, x) => x.is_income ? s : s + (x.monthly_amount || 0), 0);
@@ -215,18 +198,17 @@
               <th>Category</th>
               <th class="num">Amount</th>
               <th>Frequency</th>
-              <th>Source</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
           <tfoot>
             <tr>
-              <td colspan="4" class="total-label">Total monthly</td>
+              <td colspan="3" class="total-label">Total monthly</td>
               <td class="total-value num">${fmt(totalMonthly)}</td>
               <td></td>
             </tr>
             <tr>
-              <td colspan="4" class="total-label">Total annual</td>
+              <td colspan="3" class="total-label">Total annual</td>
               <td class="total-value num">${fmt(totalAnnual)}</td>
               <td></td>
             </tr>
