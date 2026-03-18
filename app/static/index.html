@@ -187,7 +187,9 @@
       }
 
       const fmt = (n) => n == null ? '—' : '$' + n.toFixed(2);
-      const fmtAmt = (item) => item.estimated ? '<span class="masked">$-*****</span>' : fmt(item.amount);
+      const fmtAmt = (item) => item.estimated
+        ? `<span class="masked">${fmt(item.monthly_amount)}</span>`
+        : fmt(item.amount);
 
       const rows = data.map((item, i) => `
         <tr>
@@ -196,7 +198,6 @@
           <td class="category">${escHtml(item.category)}</td>
           <td class="amount num">${fmtAmt(item)}</td>
           <td>${escHtml(item.frequency)}</td>
-          <td class="monthly num">${fmt(item.monthly_amount)}</td>
           <td>${item.estimated
             ? '<span class="badge-estimated">✨ estimated</span>'
             : '<span class="badge-actual">actual</span>'}</td>
@@ -211,16 +212,15 @@
               <th class="num">#</th>
               <th>Description Contains</th>
               <th>Category</th>
-              <th class="num">Actual Amount</th>
+              <th class="num">Amount</th>
               <th>Frequency</th>
-              <th class="num">Monthly Equiv</th>
               <th>Source</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
           <tfoot>
             <tr>
-              <td colspan="5" class="total-label">Total monthly</td>
+              <td colspan="4" class="total-label">Total monthly</td>
               <td class="total-value num">${fmt(total)}</td>
               <td></td>
             </tr>
