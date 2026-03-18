@@ -61,11 +61,14 @@ def get_expenses() -> list[dict]:
     expenses = []
     for row in autocat_rows:
         category = str(row.get("Category", "")).strip()
-        if not category or category.lower() == "transfer":
+        if not category or category.lower() in ("transfer", "delete"):
             continue
 
         raw_amount = row.get("Amount")
         frequency = str(row.get("Frequency", "monthly")).strip().lower()
+
+        if frequency in ("aperiodic",):
+            continue
 
         estimated = False
         if raw_amount in ("", None):

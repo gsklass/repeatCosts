@@ -107,6 +107,7 @@
     .category { font-weight: bold; color: var(--neon-cyan); }
 
     .amount { color: var(--neon-green); }
+    .masked { color: var(--text-dim); letter-spacing: 0.05em; }
 
     .monthly {
       color: #fff;
@@ -186,13 +187,14 @@
       }
 
       const fmt = (n) => n == null ? '—' : '$' + n.toFixed(2);
+      const fmtAmt = (item) => item.estimated ? '<span class="masked">$-*****</span>' : fmt(item.amount);
 
       const rows = data.map((item, i) => `
         <tr>
           <td class="rank num">${i + 1}</td>
           <td class="desc-contains">${escHtml(item.description_contains)}</td>
           <td class="category">${escHtml(item.category)}</td>
-          <td class="amount num">${fmt(item.amount)}</td>
+          <td class="amount num">${fmtAmt(item)}</td>
           <td>${escHtml(item.frequency)}</td>
           <td class="monthly num">${fmt(item.monthly_amount)}</td>
           <td>${item.estimated

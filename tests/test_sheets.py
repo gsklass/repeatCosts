@@ -163,9 +163,21 @@ def test_get_expenses_monthly_amount_uses_multiplier():
 
 
 def test_get_expenses_unknown_frequency_defaults_to_monthly():
-    rows = [{"Category": "Misc", "Description Contains": "", "Amount": "10.00", "Frequency": "aperiodic"}]
+    rows = [{"Category": "Misc", "Description Contains": "", "Amount": "10.00", "Frequency": "fortnightly"}]
     expenses = _patched_get_expenses(rows, [])
     assert expenses[0]["monthly_amount"] == 10.0
+
+
+def test_get_expenses_filters_aperiodic():
+    rows = [{"Category": "Bonus", "Description Contains": "", "Amount": "500", "Frequency": "aperiodic"}]
+    expenses = _patched_get_expenses(rows, [])
+    assert expenses == []
+
+
+def test_get_expenses_filters_delete_category():
+    rows = [{"Category": "DELETE", "Description Contains": "", "Amount": "50", "Frequency": "monthly"}]
+    expenses = _patched_get_expenses(rows, [])
+    assert expenses == []
 
 
 def test_get_expenses_no_match_for_blank_amount_sets_zero():
