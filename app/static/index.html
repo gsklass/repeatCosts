@@ -203,7 +203,7 @@
             : '<span class="badge-actual">actual</span>'}</td>
         </tr>`).join('');
 
-      const totalMonthly = data.reduce((s, x) => s + (x.monthly_amount || 0), 0);
+      const totalMonthly = data.reduce((s, x) => x.is_income ? s : s + (x.monthly_amount || 0), 0);
       const totalAnnual = totalMonthly * 12;
 
       container.innerHTML = `

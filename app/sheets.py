@@ -100,6 +100,7 @@ def get_expenses() -> list[dict]:
                 "frequency": frequency,
                 "estimated": estimated,
                 "monthly_amount": monthly_amount,
+                "is_income": category.lower().startswith("income"),
             }
         )
 

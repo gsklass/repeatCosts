@@ -206,6 +206,18 @@ def test_get_expenses_no_match_for_blank_amount_excluded():
     assert gym is None
 
 
+def test_get_expenses_income_flagged():
+    rows = [
+        {"Category": "Income:salary", "Description Contains": "payroll", "Amount": "5000", "Frequency": "monthly", "Notes": ""},
+        {"Category": "Rent", "Description Contains": "landlord", "Amount": "2000", "Frequency": "monthly", "Notes": ""},
+    ]
+    expenses = _patched_get_expenses(rows, [])
+    income = next(e for e in expenses if e["category"] == "Income:salary")
+    rent = next(e for e in expenses if e["category"] == "Rent")
+    assert income["is_income"] is True
+    assert rent["is_income"] is False
+
+
 def test_get_expenses_includes_description_contains():
     expenses = _patched_get_expenses(AUTOCAT_ROWS, TRANSACTIONS)
     netflix = next(e for e in expenses if e["category"] == "Netflix")
