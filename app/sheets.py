@@ -80,13 +80,16 @@ def get_expenses() -> list[dict]:
             raw_amount = estimate_amount(match_string, transactions)
             estimated = True
 
+        is_income = category.lower().startswith("income")
+
         if raw_amount in ("", None):
             amount = None
             monthly_amount = 0.0
         else:
-            amount = float(str(raw_amount).replace("$", "").replace(",", "").strip())
+            raw = abs(float(str(raw_amount).replace("$", "").replace(",", "").strip()))
+            amount = -raw if is_income else raw
             multiplier = FREQUENCY_MULTIPLIERS.get(frequency, 1.0)
-            monthly_amount = abs(amount) * multiplier
+            monthly_amount = raw * multiplier
 
         if not monthly_amount:
             continue
@@ -100,7 +103,7 @@ def get_expenses() -> list[dict]:
                 "frequency": frequency,
                 "estimated": estimated,
                 "monthly_amount": monthly_amount,
-                "is_income": category.lower().startswith("income"),
+                "is_income": is_income,
             }
         )
 

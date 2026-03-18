@@ -158,7 +158,19 @@ def test_get_expenses_actual_amount_not_estimated():
     expenses = _patched_get_expenses(AUTOCAT_ROWS, TRANSACTIONS)
     netflix = next(e for e in expenses if e["category"] == "Netflix")
     assert netflix["estimated"] is False
-    assert abs(netflix["amount"]) == 15.99
+    assert netflix["amount"] == 15.99
+
+
+def test_get_expenses_income_amount_is_negative():
+    rows = [{"Category": "Income:salary", "Description Contains": "payroll", "Amount": "-$5000", "Frequency": "monthly", "Notes": ""}]
+    expenses = _patched_get_expenses(rows, [])
+    assert expenses[0]["amount"] == -5000.0
+
+
+def test_get_expenses_expense_amount_is_positive():
+    rows = [{"Category": "Rent", "Description Contains": "landlord", "Amount": "-$2000", "Frequency": "monthly", "Notes": ""}]
+    expenses = _patched_get_expenses(rows, [])
+    assert expenses[0]["amount"] == 2000.0
 
 
 def test_get_expenses_blank_amount_marked_estimated():
