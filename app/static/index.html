@@ -103,6 +103,7 @@
       width: 2.5rem;
     }
 
+    .desc-contains { color: var(--text-dim); font-size: 0.85rem; }
     .category { font-weight: bold; color: var(--neon-cyan); }
 
     .amount { color: var(--neon-green); }
@@ -189,6 +190,7 @@
       const rows = data.map((item, i) => `
         <tr>
           <td class="rank num">${i + 1}</td>
+          <td class="desc-contains">${escHtml(item.description_contains)}</td>
           <td class="category">${escHtml(item.category)}</td>
           <td class="amount num">${fmt(item.amount)}</td>
           <td>${escHtml(item.frequency)}</td>
@@ -205,6 +207,7 @@
           <thead>
             <tr>
               <th class="num">#</th>
+              <th>Description Contains</th>
               <th>Category</th>
               <th class="num">Amount</th>
               <th>Frequency</th>
@@ -215,7 +218,7 @@
           <tbody>${rows}</tbody>
           <tfoot>
             <tr>
-              <td colspan="4" class="total-label">Total monthly</td>
+              <td colspan="5" class="total-label">Total monthly</td>
               <td class="total-value num">${fmt(total)}</td>
               <td></td>
             </tr>

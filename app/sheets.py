@@ -30,7 +30,7 @@ def get_sheet_client() -> gspread.Client:
 
 def load_autocat(sheet: gspread.Spreadsheet) -> list[dict]:
     ws = sheet.worksheet("AutoCat")
-    rows = ws.get_all_records(expected_headers=["Category", "Amount", "Frequency"])
+    rows = ws.get_all_records()
     return rows
 
 
@@ -82,6 +82,7 @@ def get_expenses() -> list[dict]:
 
         expenses.append(
             {
+                "description_contains": str(row.get("Description Contains", "")).strip(),
                 "category": category,
                 "amount": amount,
                 "frequency": frequency,
