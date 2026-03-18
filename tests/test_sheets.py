@@ -200,12 +200,10 @@ def test_get_expenses_filters_delete_category():
     assert expenses == []
 
 
-def test_get_expenses_no_match_for_blank_amount_sets_zero():
+def test_get_expenses_no_match_for_blank_amount_excluded():
     expenses = _patched_get_expenses(AUTOCAT_ROWS, TRANSACTIONS)
     gym = next((e for e in expenses if e["category"] == "Gym"), None)
-    assert gym is not None
-    assert gym["amount"] is None
-    assert gym["monthly_amount"] == 0.0
+    assert gym is None
 
 
 def test_get_expenses_includes_description_contains():

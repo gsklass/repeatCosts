@@ -88,6 +88,9 @@ def get_expenses() -> list[dict]:
             multiplier = FREQUENCY_MULTIPLIERS.get(frequency, 1.0)
             monthly_amount = abs(amount) * multiplier
 
+        if not monthly_amount:
+            continue
+
         expenses.append(
             {
                 "description_contains": str(row.get("Description Contains", "")).strip(),
