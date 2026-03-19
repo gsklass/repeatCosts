@@ -55,12 +55,23 @@ def load_transactions(sheet: gspread.Spreadsheet) -> list[dict]:
     return rows
 
 
+_DATE_FORMATS = ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y", "%d/%m/%Y")
+
+
+def _parse_date(s: str) -> date | None:
+    for fmt in _DATE_FORMATS:
+        try:
+            return datetime.strptime(s, fmt).date()
+        except ValueError:
+            pass
+    return None
+
+
 def ceased_by_last_date(last_date_str: str, frequency: str, today: date | None = None) -> bool:
     if not str(last_date_str).strip():
         return True
-    try:
-        last = datetime.strptime(str(last_date_str).strip(), "%Y-%m-%d").date()
-    except ValueError:
+    last = _parse_date(str(last_date_str).strip())
+    if last is None:
         return True
     if today is None:
         today = date.today()

@@ -258,6 +258,15 @@ def test_ceased_recent_last_date_not_ceased():
     assert ceased_by_last_date("2026-03-01", "monthly", today=date(2026, 3, 19)) is False
 
 
+def test_ceased_mdyyyy_format_not_ceased():
+    # Google Sheets M/D/YYYY format
+    assert ceased_by_last_date("3/1/2026", "monthly", today=date(2026, 3, 19)) is False
+
+
+def test_ceased_mdyyyy_format_is_ceased():
+    assert ceased_by_last_date("12/1/2025", "monthly", today=date(2026, 3, 19)) is True
+
+
 def test_ceased_old_last_date_is_ceased():
     # 2025-12-01 is 108 days ago; monthly cutoff = 62 days → ceased
     assert ceased_by_last_date("2025-12-01", "monthly", today=date(2026, 3, 19)) is True
