@@ -127,12 +127,7 @@
     .key-swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; }
     .key-swatch.actual { background: var(--neon-green); }
     .key-swatch.estimated { background: var(--text-dim); }
-    .key-swatch.ceased { background: #ff4d6d; }
-
-    tr.ceased { opacity: 0.35; }
-    tr.ceased td.desc-contains { text-decoration: line-through; }
-
-    .loading, .error {
+.loading, .error {
       text-align: center;
       padding: 3rem;
       color: var(--text-dim);
@@ -155,7 +150,6 @@
   <div class="key">
     <span class="key-item"><span class="key-swatch actual"></span> actual</span>
     <span class="key-item"><span class="key-swatch estimated"></span> estimated</span>
-    <span class="key-item"><span class="key-swatch ceased"></span> ceased</span>
   </div>
 
   <script>
@@ -183,7 +177,7 @@
         : `<span class="amount">${fmt(item.amount)}</span>`;
 
       const rows = data.map((item, i) => `
-        <tr${item.ceased ? ' class="ceased"' : ''}>
+        <tr>
           <td class="rank num">${i + 1}</td>
           <td class="desc-contains">${escHtml(item.description_contains)}</td>
           <td class="category">${escHtml(item.category)}</td>

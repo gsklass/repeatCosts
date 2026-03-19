@@ -55,25 +55,17 @@ def load_transactions(sheet: gspread.Spreadsheet) -> list[dict]:
     return rows
 
 
-def latest_transaction_date(match_string: str, transactions: list[dict]) -> date | None:
-    matched = []
-    for t in transactions:
-        if match_string.lower() in str(t.get("Description", "")).lower():
-            try:
-                matched.append(datetime.strptime(str(t.get("Date", "")), "%Y-%m-%d").date())
-            except ValueError:
-                pass
-    return max(matched) if matched else None
-
-
-def is_ceased(match_string: str, frequency: str, transactions: list[dict], today: date | None = None) -> bool:
-    latest = latest_transaction_date(match_string, transactions)
-    if latest is None:
-        return False
+def ceased_by_last_date(last_date_str: str, frequency: str, today: date | None = None) -> bool:
+    if not str(last_date_str).strip():
+        return True
+    try:
+        last = datetime.strptime(str(last_date_str).strip(), "%Y-%m-%d").date()
+    except ValueError:
+        return True
     if today is None:
         today = date.today()
     period_days = FREQUENCY_DAYS.get(frequency, 31)
-    return latest < today - timedelta(days=period_days * 2)
+    return last < today - timedelta(days=period_days * 2)
 
 
 def estimate_amount(match_string: str, transactions: list[dict]) -> float | None:
@@ -104,6 +96,10 @@ def get_expenses() -> list[dict]:
         frequency = str(row.get("Frequency", "monthly")).strip().lower()
 
         if frequency in ("aperiodic", "old"):
+            continue
+
+        last_date = str(row.get("Last Date", "")).strip()
+        if ceased_by_last_date(last_date, frequency):
             continue
 
         desc_contains = str(row.get("Description Contains", "")).strip()
@@ -138,7 +134,6 @@ def get_expenses() -> list[dict]:
                 "estimated": estimated,
                 "monthly_amount": monthly_amount,
                 "is_income": is_income,
-                "ceased": is_ceased(match_string, frequency, transactions),
             }
         )
 
