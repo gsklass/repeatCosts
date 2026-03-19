@@ -1,4 +1,5 @@
 import statistics
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import gspread
@@ -8,6 +9,17 @@ SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
 ]
+
+FREQUENCY_DAYS = {
+    "weekly": 7,
+    "biweekly": 14,
+    "bi-weekly": 14,
+    "monthly": 31,
+    "quarterly": 92,
+    "halfyearly": 183,
+    "yearly": 366,
+    "annually": 366,
+}
 
 FREQUENCY_MULTIPLIERS = {
     "weekly": 4.33,
@@ -43,6 +55,27 @@ def load_transactions(sheet: gspread.Spreadsheet) -> list[dict]:
     return rows
 
 
+def latest_transaction_date(match_string: str, transactions: list[dict]) -> date | None:
+    matched = []
+    for t in transactions:
+        if match_string.lower() in str(t.get("Description", "")).lower():
+            try:
+                matched.append(datetime.strptime(str(t.get("Date", "")), "%Y-%m-%d").date())
+            except ValueError:
+                pass
+    return max(matched) if matched else None
+
+
+def is_ceased(match_string: str, frequency: str, transactions: list[dict], today: date | None = None) -> bool:
+    latest = latest_transaction_date(match_string, transactions)
+    if latest is None:
+        return False
+    if today is None:
+        today = date.today()
+    period_days = FREQUENCY_DAYS.get(frequency, 31)
+    return latest < today - timedelta(days=period_days * 2)
+
+
 def estimate_amount(match_string: str, transactions: list[dict]) -> float | None:
     matched = [
         abs(float(str(t["Amount"]).replace("$", "").replace(",", "").strip()))
@@ -73,10 +106,11 @@ def get_expenses() -> list[dict]:
         if frequency in ("aperiodic", "old"):
             continue
 
+        desc_contains = str(row.get("Description Contains", "")).strip()
+        match_string = desc_contains if desc_contains else category
+
         estimated = False
         if raw_amount in ("", None):
-            desc_contains = str(row.get("Description Contains", "")).strip()
-            match_string = desc_contains if desc_contains else category
             raw_amount = estimate_amount(match_string, transactions)
             estimated = True
 
@@ -104,6 +138,7 @@ def get_expenses() -> list[dict]:
                 "estimated": estimated,
                 "monthly_amount": monthly_amount,
                 "is_income": is_income,
+                "ceased": is_ceased(match_string, frequency, transactions),
             }
         )
 

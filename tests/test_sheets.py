@@ -1,6 +1,7 @@
+from datetime import date
 from unittest.mock import MagicMock, patch
 
-from app.sheets import estimate_amount, FREQUENCY_MULTIPLIERS, get_expenses
+from app.sheets import estimate_amount, FREQUENCY_MULTIPLIERS, get_expenses, is_ceased, latest_transaction_date
 
 
 # ---------------------------------------------------------------------------
@@ -234,3 +235,66 @@ def test_get_expenses_includes_description_contains():
     expenses = _patched_get_expenses(AUTOCAT_ROWS, TRANSACTIONS)
     netflix = next(e for e in expenses if e["category"] == "Netflix")
     assert netflix["description_contains"] == "netflix"
+
+
+# ---------------------------------------------------------------------------
+# latest_transaction_date
+# ---------------------------------------------------------------------------
+
+def test_latest_transaction_date_returns_most_recent():
+    result = latest_transaction_date("netflix", TRANSACTIONS)
+    assert result == date(2026, 3, 1)
+
+
+def test_latest_transaction_date_case_insensitive():
+    result = latest_transaction_date("NETFLIX", TRANSACTIONS)
+    assert result == date(2026, 3, 1)
+
+
+def test_latest_transaction_date_no_match_returns_none():
+    result = latest_transaction_date("hulu", TRANSACTIONS)
+    assert result is None
+
+
+def test_latest_transaction_date_skips_unparseable_dates():
+    txns = [
+        {"Date": "not-a-date", "Description": "Netflix", "Amount": 15.99},
+        {"Date": "2026-02-01", "Description": "Netflix", "Amount": 15.99},
+    ]
+    result = latest_transaction_date("netflix", txns)
+    assert result == date(2026, 2, 1)
+
+
+# ---------------------------------------------------------------------------
+# is_ceased
+# ---------------------------------------------------------------------------
+
+def test_is_ceased_recent_transaction_not_ceased():
+    today = date(2026, 3, 19)
+    txns = [{"Date": "2026-03-01", "Description": "Netflix monthly", "Amount": 15.99}]
+    assert is_ceased("netflix", "monthly", txns, today=today) is False
+
+
+def test_is_ceased_old_transaction_is_ceased():
+    today = date(2026, 3, 19)
+    # Last seen 2025-12-01 — over 2 months ago, period is 31 days, cutoff = 2026-01-16
+    txns = [{"Date": "2025-12-01", "Description": "Netflix monthly", "Amount": 15.99}]
+    assert is_ceased("netflix", "monthly", txns, today=today) is True
+
+
+def test_is_ceased_no_transactions_returns_false():
+    today = date(2026, 3, 19)
+    assert is_ceased("hulu", "monthly", TRANSACTIONS, today=today) is False
+
+
+def test_is_ceased_uses_frequency_period():
+    today = date(2026, 3, 19)
+    # Annual subscription last seen 8 months ago — within 2 * 366 days, not ceased
+    txns = [{"Date": "2025-07-19", "Description": "Adobe annual", "Amount": 600.00}]
+    assert is_ceased("adobe", "yearly", txns, today=today) is False
+
+
+def test_get_expenses_includes_ceased_field():
+    expenses = _patched_get_expenses(AUTOCAT_ROWS, TRANSACTIONS)
+    for e in expenses:
+        assert "ceased" in e
