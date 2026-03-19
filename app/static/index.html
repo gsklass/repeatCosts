@@ -171,7 +171,7 @@
         return;
       }
 
-      const fmt = (n) => n == null ? '—' : '$' + Math.abs(n).toFixed(2);
+      const fmt = (n) => n == null ? '—' : (n < 0 ? '-$' : '$') + Math.abs(n).toFixed(2);
       const fmtAmt = (item) => item.estimated
         ? `<span class="masked">${fmt(item.amount)}</span>`
         : `<span class="amount">${fmt(item.amount)}</span>`;
