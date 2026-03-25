@@ -12,3 +12,5 @@ env/
 .ruff_cache/
 htmlcov/
 .coverage
+credentials.json
+token.json
